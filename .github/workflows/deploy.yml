@@ -22,7 +22,7 @@ jobs:
 
       - name: Build application
         run: |
-          npm ci
+          npm i --legacy-peer-deps
           npm run build -- --base=/geostyler-dsfr-example/
 
       - name: Deploy 🚀
