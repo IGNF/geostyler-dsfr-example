@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { XMLParser } from "fast-xml-parser";
+import { MapboxStyleParser, MbStyle } from "geostyler-mapbox-parser";
+import OpenLayersParser from "geostyler-openlayers-parser";
 import { View } from "ol";
 import Map from "ol/Map";
 import { ScaleLine, defaults as defaultControls } from "ol/control";
@@ -10,7 +12,7 @@ import VectorTileLayer from "ol/layer/VectorTile";
 import { fromLonLat, transformExtent } from "ol/proj";
 import VectorTileSource from "ol/source/VectorTile";
 import WMTS, { optionsFromCapabilities } from "ol/source/WMTS";
-import { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import { FC, useEffect, useMemo, useRef } from "react";
 
 import useCapabilities from "../hooks/useCapabilities";
 import { jsonFetch } from "../modules/jsonFetch";
@@ -20,17 +22,21 @@ import olDefaults from "../data/ol-defaults.json";
 import "ol/ol.css";
 import "../css/olx.css";
 
-
 const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
 // const SERVICE_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/{z}/{x}/{y}.pbf`;
 const SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
 const METADATA_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/metadata.json`;
 
+const STYLE_URL =
+    "https://data.geopf.fr/annexes/ccommunaute-test_xavier/style/c426b115-e0fa-4bbc-bbb6-f79383829665.json";
+
 const RMap: FC = () => {
     const mapTargetRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map>();
 
-    // bg layer
+    /**************************************************************************
+     * bg layer
+     **************************************************************************/
     const { data: capabilities } = useCapabilities();
 
     const bgLayer = useMemo(() => {
@@ -48,17 +54,21 @@ const RMap: FC = () => {
         return bgLayer;
     }, [capabilities]);
 
-    // data layer
-    const serviceMetadataQuery = useQuery({
+    /**************************************************************************
+     * service layer
+     **************************************************************************/
+    const serviceMetadataQuery = useQuery<any>({
         queryKey: ["service", LAYER_NAME, "metadata"],
         queryFn: ({ signal }) => jsonFetch(METADATA_URL, { signal }),
+        staleTime: 36000,
     });
     const { data: serviceMetadata } = serviceMetadataQuery;
 
-    const getInfo = useCallback(
-        async (url: string, config: RequestInit): Promise<{ title: string; tileSize: number[] }> => {
-            const response = await fetch(url, config);
-            if (!response.ok) throw Error(`Error fetching URL ${url}.`);
+    const serviceInfoQuery = useQuery({
+        queryKey: ["service", LAYER_NAME, "info"],
+        queryFn: async ({ signal }) => {
+            const response = await fetch(SERVICE_INFO_URL, { signal });
+            if (!response.ok) throw Error(`Error fetching URL ${SERVICE_INFO_URL}.`);
 
             const xml = await response.text();
             const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "" });
@@ -69,21 +79,12 @@ const RMap: FC = () => {
                 tileSize: [parseInt(json.TileMap.TileFormat.width, 10), parseInt(json.TileMap.TileFormat.height, 10)],
             };
         },
-        []
-    );
-
-    const serviceInfoQuery = useQuery({
-        queryKey: ["service", LAYER_NAME, "info"],
-        queryFn: ({ signal }) => {
-            return getInfo(SERVICE_INFO_URL, { signal });
-        },
+        staleTime: 36000,
     });
     const { data: serviceInfo } = serviceInfoQuery;
 
-    const dataLayer = useMemo(() => {
+    const serviceLayer = useMemo(() => {
         if (serviceMetadata === undefined || serviceInfo === undefined) return;
-
-        console.log(serviceInfo, serviceMetadata);
 
         const layer = new VectorTileLayer({
             minZoom: serviceMetadata?.minzoom,
@@ -104,16 +105,18 @@ const RMap: FC = () => {
         return layer;
     }, [serviceMetadata, serviceInfo]);
 
-    // création de la carte une fois bg layer et data layer crées
+    /**************************************************************************
+     * création de la carte une fois bg layer et data layer crées
+     **************************************************************************/
     useEffect(() => {
-        if (!bgLayer || !dataLayer || !serviceMetadata) return;
+        if (!bgLayer || !serviceLayer || !serviceMetadata) return;
 
         const controls = defaultControls();
-        controls.push(new ScaleLine())
+        controls.push(new ScaleLine());
 
         mapRef.current = new Map({
             target: mapTargetRef.current as HTMLElement,
-            layers: [bgLayer, dataLayer],
+            layers: [bgLayer, serviceLayer],
             interactions: defaultInteractions(),
             controls: controls,
             view: new View({
@@ -132,7 +135,39 @@ const RMap: FC = () => {
         }
 
         return () => mapRef.current?.setTarget(undefined);
-    }, [bgLayer, dataLayer, serviceMetadata]);
+    }, [bgLayer, serviceLayer, serviceMetadata]);
+
+    /**************************************************************************
+     * style mapbox
+     **************************************************************************/
+    const mbStyleQuery = useQuery({
+        queryKey: ["service", LAYER_NAME, "style"],
+        queryFn: ({ signal }) => jsonFetch<MbStyle>(STYLE_URL, { signal }),
+        staleTime: 36000,
+    });
+    const { data: mbStyle } = mbStyleQuery;
+
+    useEffect(() => {
+        if (!mbStyle) return;
+
+        const mbParser = new MapboxStyleParser();
+        const olParser = new OpenLayersParser();
+
+        mbParser
+            .readStyle(mbStyle)
+            .then((result) => {
+                console.log(result);
+
+                if (result.output) {
+                    olParser.writeStyle(result.output).then(result => {
+                        serviceLayer?.setStyle(result.output)
+                    })
+                }
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+    }, [mbStyle, serviceLayer]);
 
     return <div ref={mapTargetRef} className="map-view" />;
 };

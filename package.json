@@ -20,6 +20,9 @@
     "@tanstack/react-query": "^5.45.1",
     "@tanstack/react-query-devtools": "^5.45.1",
     "fast-xml-parser": "^4.4.0",
+    "geostyler": "^14.1.4",
+    "geostyler-mapbox-parser": "^5.0.1",
+    "geostyler-openlayers-parser": "^4.3.0",
     "ol": "6.9.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

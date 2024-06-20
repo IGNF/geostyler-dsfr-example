@@ -27,6 +27,7 @@ module.exports = {
     "react/default-props-match-prop-types": "error",
     "react/jsx-no-duplicate-props": "error",
     "react/prefer-exact-props": "error",
+    "@typescript-eslint/no-explicit-any": "off"
   },
   settings: {
     react: { version: "detect" },
