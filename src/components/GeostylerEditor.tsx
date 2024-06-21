@@ -1,10 +1,29 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
-import { CardStyle, CodeEditor, GeoStylerContext, GeoStylerContextInterface, Style } from "geostyler";
+import { CardStyle, CodeEditor, GeoStylerContext, GeoStylerContextInterface, Style, locale } from "geostyler";
+import MapboxStyleParser from "geostyler-mapbox-parser";
+import QGISStyleParser from "geostyler-qgis-parser";
+import SldStyleParser from "geostyler-sld-parser";
 import { Style as GsStyle } from "geostyler-style";
 import { FC } from "react";
 
 import DsfrAntdConfig from "./DsfrAntdConfig";
+
+const qgisParser = new QGISStyleParser();
+qgisParser.title = "QML (QGIS)";
+
+const mbParser = new MapboxStyleParser({
+    pretty: true,
+});
+const sld100Parser = new SldStyleParser({
+    sldVersion: "1.0.0",
+});
+sld100Parser.title = "SLD 1.0.0";
+
+const sld110Parser = new SldStyleParser({
+    sldVersion: "1.1.0",
+});
+sld110Parser.title = "SLD 1.1.0";
 
 type GeostylerEditorProps = {
     gsStyle: GsStyle;
@@ -14,6 +33,7 @@ type GeostylerEditorProps = {
 const GeostylerEditor: FC<GeostylerEditorProps> = ({ gsStyle, onStyleChange }) => {
     const ctx: GeoStylerContextInterface = {
         composition: {},
+        locale: locale.fr_FR,
     };
 
     return (
@@ -52,6 +72,8 @@ const GeostylerEditor: FC<GeostylerEditorProps> = ({ gsStyle, onStyleChange }) =
                                             onStyleChange={onStyleChange}
                                             showCopyButton={true}
                                             showSaveButton={true}
+                                            defaultParser={mbParser}
+                                            parsers={[mbParser, qgisParser, sld100Parser, sld110Parser]}
                                         />
                                     </div>
                                 </div>
