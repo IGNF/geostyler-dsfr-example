@@ -37,7 +37,13 @@ const App = () => {
     return (
         <>
             <Header
-                brandTop={<>République<br />Française</>}
+                brandTop={
+                    <>
+                        République
+                        <br />
+                        Française
+                    </>
+                }
                 homeLinkProps={{
                     href: "/",
                     title: title,

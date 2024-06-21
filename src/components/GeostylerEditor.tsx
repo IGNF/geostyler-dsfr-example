@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { CardStyle, CodeEditor, Style } from "geostyler";
+import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
+import { CardStyle, CodeEditor, GeoStylerContext, GeoStylerContextInterface, Style } from "geostyler";
 import { Style as GsStyle } from "geostyler-style";
 import { FC } from "react";
 
@@ -11,24 +12,50 @@ type GeostylerEditorProps = {
 };
 
 const GeostylerEditor: FC<GeostylerEditorProps> = ({ gsStyle, onStyleChange }) => {
+    const ctx: GeoStylerContextInterface = {
+        composition: {},
+    };
+
     return (
-        <DsfrAntdConfig>
-            <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
-                <div className={fr.cx("fr-col")}>
-                    <Style style={gsStyle} onStyleChange={onStyleChange} />
-                </div>
-            </div>
-            <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
-                <div className={fr.cx("fr-col")}>
-                    <CardStyle style={gsStyle} onStyleChange={onStyleChange} />
-                </div>
-            </div>
-            <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
-                <div className={fr.cx("fr-col")}>
-                    <CodeEditor style={gsStyle} onStyleChange={onStyleChange} />
-                </div>
-            </div>
-        </DsfrAntdConfig>
+        <GeoStylerContext.Provider value={ctx}>
+            <DsfrAntdConfig>
+                <Tabs
+                    label="Editeur de style"
+                    tabs={[
+                        {
+                            label: "Tableau",
+                            content: (
+                                <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
+                                    <div className={fr.cx("fr-col")}>
+                                        <Style style={gsStyle} onStyleChange={onStyleChange} />
+                                    </div>
+                                </div>
+                            ),
+                        },
+                        {
+                            label: "Cartes",
+                            content: (
+                                <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
+                                    <div className={fr.cx("fr-col")}>
+                                        <CardStyle style={gsStyle} onStyleChange={onStyleChange} />
+                                    </div>
+                                </div>
+                            ),
+                        },
+                        {
+                            label: "Editeur de code",
+                            content: (
+                                <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
+                                    <div className={fr.cx("fr-col")}>
+                                        <CodeEditor style={gsStyle} onStyleChange={onStyleChange} />
+                                    </div>
+                                </div>
+                            ),
+                        },
+                    ]}
+                />
+            </DsfrAntdConfig>
+        </GeoStylerContext.Provider>
     );
 };
 
