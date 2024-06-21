@@ -9,6 +9,8 @@ import { FC } from "react";
 
 import DsfrAntdConfig from "./DsfrAntdConfig";
 
+import "../css/geostyler.css";
+
 const qgisParser = new QGISStyleParser();
 qgisParser.title = "QML (QGIS)";
 
@@ -67,14 +69,16 @@ const GeostylerEditor: FC<GeostylerEditorProps> = ({ gsStyle, onStyleChange }) =
                             content: (
                                 <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
                                     <div className={fr.cx("fr-col")}>
-                                        <CodeEditor
-                                            style={gsStyle}
-                                            onStyleChange={onStyleChange}
-                                            showCopyButton={true}
-                                            showSaveButton={true}
-                                            defaultParser={mbParser}
-                                            parsers={[mbParser, qgisParser, sld100Parser, sld110Parser]}
-                                        />
+                                        <div className="code-editor-container">
+                                            <CodeEditor
+                                                style={gsStyle}
+                                                onStyleChange={onStyleChange}
+                                                defaultParser={mbParser}
+                                                showCopyButton={true}
+                                                showSaveButton={true}
+                                                parsers={[mbParser, qgisParser, sld100Parser, sld110Parser]}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             ),
