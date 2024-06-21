@@ -37,11 +37,12 @@ const App = () => {
     return (
         <>
             <Header
-                brandTop={title}
+                brandTop={<>République<br />Française</>}
                 homeLinkProps={{
                     href: "/",
                     title: title,
                 }}
+                serviceTitle={title}
                 quickAccessItems={[headerFooterDisplayItem]}
             />
             <main className={fr.cx("fr-container", "fr-my-2v")}>
