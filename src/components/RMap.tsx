@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { XMLParser } from "fast-xml-parser";
-import { MapboxStyleParser, MbStyle } from "geostyler-mapbox-parser";
 import OpenLayersParser from "geostyler-openlayers-parser";
+import { Style as GsStyle } from "geostyler-style";
 import { View } from "ol";
 import Map from "ol/Map";
 import { ScaleLine, defaults as defaultControls } from "ol/control";
@@ -22,15 +22,18 @@ import olDefaults from "../data/ol-defaults.json";
 import "ol/ol.css";
 import "../css/olx.css";
 
-const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
+export const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
 // const SERVICE_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/{z}/{x}/{y}.pbf`;
 const SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
 const METADATA_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/metadata.json`;
 
-const STYLE_URL =
+export const STYLE_URL =
     "https://data.geopf.fr/annexes/ccommunaute-test_xavier/style/c426b115-e0fa-4bbc-bbb6-f79383829665.json";
 
-const RMap: FC = () => {
+type RMapProps = {
+    gsStyle: GsStyle;
+};
+const RMap: FC<RMapProps> = ({ gsStyle }) => {
     const mapTargetRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map>();
 
@@ -138,36 +141,15 @@ const RMap: FC = () => {
     }, [bgLayer, serviceLayer, serviceMetadata]);
 
     /**************************************************************************
-     * style mapbox
+     * application du style
      **************************************************************************/
-    const mbStyleQuery = useQuery({
-        queryKey: ["service", LAYER_NAME, "style"],
-        queryFn: ({ signal }) => jsonFetch<MbStyle>(STYLE_URL, { signal }),
-        staleTime: 36000,
-    });
-    const { data: mbStyle } = mbStyleQuery;
-
     useEffect(() => {
-        if (!mbStyle) return;
-
-        const mbParser = new MapboxStyleParser();
         const olParser = new OpenLayersParser();
 
-        mbParser
-            .readStyle(mbStyle)
-            .then((result) => {
-                console.log(result);
-
-                if (result.output) {
-                    olParser.writeStyle(result.output).then(result => {
-                        serviceLayer?.setStyle(result.output)
-                    })
-                }
-            })
-            .catch((e) => {
-                console.error(e);
-            });
-    }, [mbStyle, serviceLayer]);
+        olParser.writeStyle(gsStyle).then((result) => {
+            serviceLayer?.setStyle(result.output);
+        });
+    }, [serviceLayer, gsStyle]);
 
     return <div ref={mapTargetRef} className="map-view" />;
 };
