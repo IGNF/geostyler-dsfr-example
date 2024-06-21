@@ -22,23 +22,18 @@ import olDefaults from "../data/ol-defaults.json";
 import "ol/ol.css";
 import "../css/olx.css";
 
-export const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
-// const SERVICE_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/{z}/{x}/{y}.pbf`;
-const SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
-const METADATA_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/metadata.json`;
-
-export const STYLE_URL =
-    "https://data.geopf.fr/annexes/ccommunaute-test_xavier/style/c426b115-e0fa-4bbc-bbb6-f79383829665.json";
-
 type RMapProps = {
     gsStyle: GsStyle;
+    serviceUrl: string;
 };
-const RMap: FC<RMapProps> = ({ gsStyle }) => {
+const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
     const mapTargetRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map>();
 
+    const metadataUrl = useMemo(() => `${serviceUrl}/metadata.json`, [serviceUrl]);
+
     /**************************************************************************
-     * bg layer
+     * création de la couche openlayers de fond (bg layer)
      **************************************************************************/
     const { data: capabilities } = useCapabilities();
 
@@ -58,20 +53,20 @@ const RMap: FC<RMapProps> = ({ gsStyle }) => {
     }, [capabilities]);
 
     /**************************************************************************
-     * service layer
+     * création de la couche openlayers du flux (service layer)
      **************************************************************************/
     const serviceMetadataQuery = useQuery<any>({
-        queryKey: ["service", LAYER_NAME, "metadata"],
-        queryFn: ({ signal }) => jsonFetch(METADATA_URL, { signal }),
+        queryKey: [metadataUrl],
+        queryFn: ({ signal }) => jsonFetch(metadataUrl, { signal }),
         staleTime: 36000,
     });
     const { data: serviceMetadata } = serviceMetadataQuery;
 
     const serviceInfoQuery = useQuery({
-        queryKey: ["service", LAYER_NAME, "info"],
+        queryKey: [serviceUrl],
         queryFn: async ({ signal }) => {
-            const response = await fetch(SERVICE_INFO_URL, { signal });
-            if (!response.ok) throw Error(`Error fetching URL ${SERVICE_INFO_URL}.`);
+            const response = await fetch(serviceUrl, { signal });
+            if (!response.ok) throw Error(`Error fetching URL ${serviceUrl}.`);
 
             const xml = await response.text();
             const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "" });
@@ -109,7 +104,7 @@ const RMap: FC<RMapProps> = ({ gsStyle }) => {
     }, [serviceMetadata, serviceInfo]);
 
     /**************************************************************************
-     * création de la carte une fois bg layer et data layer crées
+     * création de la carte une fois bg layer et service layer crées
      **************************************************************************/
     useEffect(() => {
         if (!bgLayer || !serviceLayer || !serviceMetadata) return;

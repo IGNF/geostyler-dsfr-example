@@ -47,7 +47,12 @@ const GeostylerEditor: FC<GeostylerEditorProps> = ({ gsStyle, onStyleChange }) =
                             content: (
                                 <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
                                     <div className={fr.cx("fr-col")}>
-                                        <CodeEditor style={gsStyle} onStyleChange={onStyleChange} />
+                                        <CodeEditor
+                                            style={gsStyle}
+                                            onStyleChange={onStyleChange}
+                                            showCopyButton={true}
+                                            showSaveButton={true}
+                                        />
                                     </div>
                                 </div>
                             ),

@@ -1,24 +1,35 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { headerFooterDisplayItem } from "@codegouvfr/react-dsfr/Display";
+import Footer from "@codegouvfr/react-dsfr/Footer";
 import { Header } from "@codegouvfr/react-dsfr/Header";
+import Input from "@codegouvfr/react-dsfr/Input";
 import { useQuery } from "@tanstack/react-query";
 import MapboxStyleParser, { MbStyle } from "geostyler-mapbox-parser";
 import { Style as GsStyle } from "geostyler-style";
-
 import { useEffect, useState } from "react";
+
 import GeostylerEditor from "./components/GeostylerEditor";
-import RMap, { LAYER_NAME, STYLE_URL } from "./components/RMap";
+import RMap from "./components/RMap";
 import { jsonFetch } from "./modules/jsonFetch";
-import Footer from "@codegouvfr/react-dsfr/Footer";
 
 const title = "Exemple d'interfaces Geostyler en DSFR";
+
+export const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
+// const SERVICE_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/{z}/{x}/{y}.pbf`;
+const SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
+
+export const STYLE_URL =
+    "https://data.geopf.fr/annexes/ccommunaute-test_xavier/style/c426b115-e0fa-4bbc-bbb6-f79383829665.json";
 
 const mbParser = new MapboxStyleParser();
 
 const App = () => {
+    const [serviceUrl, setServiceUrl] = useState(SERVICE_INFO_URL);
+    const [styleUrl, setStyleUrl] = useState(STYLE_URL);
+
     const mbStyleQuery = useQuery({
-        queryKey: ["service", LAYER_NAME, "style"],
-        queryFn: ({ signal }) => jsonFetch<MbStyle>(STYLE_URL, { signal }),
+        queryKey: [styleUrl],
+        queryFn: ({ signal }) => jsonFetch<MbStyle>(styleUrl, { signal }),
         staleTime: Infinity,
     });
 
@@ -45,18 +56,35 @@ const App = () => {
                     </>
                 }
                 homeLinkProps={{
-                    href: "/",
+                    href: "./",
                     title: title,
                 }}
                 serviceTitle={title}
                 quickAccessItems={[headerFooterDisplayItem]}
             />
             <main className={fr.cx("fr-container", "fr-my-2v")}>
+                <Input
+                    label={"URL du flux tuiles vectorielles"}
+                    nativeInputProps={{
+                        value: serviceUrl,
+                        onChange: (e) => setServiceUrl(e.currentTarget.value),
+                        placeholder: SERVICE_INFO_URL,
+                    }}
+                />
+                <Input
+                    label={"URL du style mapbox"}
+                    nativeInputProps={{
+                        value: styleUrl,
+                        onChange: (e) => setStyleUrl(e.currentTarget.value),
+                        placeholder: STYLE_URL,
+                    }}
+                />
+
                 {gsStyle !== undefined && (
                     <>
                         <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
                             <div className={fr.cx("fr-col")}>
-                                <RMap gsStyle={gsStyle} />
+                                <RMap gsStyle={gsStyle} serviceUrl={serviceUrl} />
                             </div>
                         </div>
 
