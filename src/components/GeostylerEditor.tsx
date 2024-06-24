@@ -1,4 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { CardStyle, CodeEditor, GeoStylerContext, GeoStylerContextInterface, Style, locale } from "geostyler";
 import MapboxStyleParser from "geostyler-mapbox-parser";
@@ -6,6 +8,7 @@ import QGISStyleParser from "geostyler-qgis-parser";
 import SldStyleParser from "geostyler-sld-parser";
 import { Style as GsStyle } from "geostyler-style";
 import { FC } from "react";
+import { Input as AntdInput } from "antd";
 
 import DsfrAntdConfig from "./DsfrAntdConfig";
 
@@ -85,6 +88,10 @@ const GeostylerEditor: FC<GeostylerEditorProps> = ({ gsStyle, onStyleChange }) =
                         },
                     ]}
                 />
+                <Button>Hello</Button>
+                <Input label="Input DSFR disabled" disabled />
+                <Input label="Input DSFR" />
+                <AntdInput title="Input Antd" />
             </DsfrAntdConfig>
         </GeoStylerContext.Provider>
     );
