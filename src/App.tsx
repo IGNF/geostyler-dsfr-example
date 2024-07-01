@@ -9,6 +9,7 @@ import { Style as GsStyle } from "geostyler-style";
 import { useEffect, useState } from "react";
 
 import GeostylerEditor from "./components/GeostylerEditor";
+import GeostylerLegend from "./components/GeostylerLegend";
 import RMap from "./components/RMap";
 import { jsonFetch } from "./modules/jsonFetch";
 
@@ -83,8 +84,11 @@ const App = () => {
                 {gsStyle !== undefined && (
                     <>
                         <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
-                            <div className={fr.cx("fr-col")}>
+                            <div className={fr.cx("fr-col-8")}>
                                 <RMap gsStyle={gsStyle} serviceUrl={serviceUrl} />
+                            </div>
+                            <div className={fr.cx("fr-col-4")}>
+                                <GeostylerLegend gsStyle={gsStyle} />
                             </div>
                         </div>
 

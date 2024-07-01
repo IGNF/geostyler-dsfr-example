@@ -146,6 +146,8 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
         });
     }, [serviceLayer, gsStyle]);
 
+    console.log("RMap render");
+
     return <div ref={mapTargetRef} className="map-view" />;
 };
 
