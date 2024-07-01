@@ -1,31 +1,31 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
+    push:
+        branches: [main]
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  build-and-deploy:
-    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
-    runs-on: ubuntu-latest
+    build-and-deploy:
+        concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20.x"
 
-      - name: Build application
-        run: |
-          npm i --legacy-peer-deps
-          npm run build -- --base=/geostyler-dsfr-example/
+            - name: Build application
+              run: |
+                  npm ci
+                  npm run build -- --base=/geostyler-dsfr-example/
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
+            - name: Deploy 🚀
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                  folder: dist

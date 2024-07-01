@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { XMLParser } from "fast-xml-parser";
+import LayerSwitcher from "geoportal-extensions-openlayers/src/OpenLayers/Controls/LayerSwitcher";
 import OpenLayersParser from "geostyler-openlayers-parser";
 import { Style as GsStyle } from "geostyler-style";
 import { View } from "ol";
@@ -21,6 +22,8 @@ import olDefaults from "../data/ol-defaults.json";
 
 import "ol/ol.css";
 import "../css/olx.css";
+
+import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
 
 type RMapProps = {
     gsStyle: GsStyle;
@@ -107,10 +110,29 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
      * création de la carte une fois bg layer et service layer crées
      **************************************************************************/
     useEffect(() => {
-        if (!bgLayer || !serviceLayer || !serviceMetadata) return;
+        if (!bgLayer || !serviceLayer || !serviceMetadata || !serviceInfo) return;
 
         const controls = defaultControls();
         controls.push(new ScaleLine());
+        controls.push(
+            new LayerSwitcher({
+                layers: [
+                    {
+                        layer: bgLayer,
+                        config: {
+                            title: "Plan IGN v2",
+                        },
+                    },
+                    {
+                        layer: serviceLayer,
+                        config: {
+                            title: serviceInfo.title,
+                            description: serviceMetadata?.description,
+                        },
+                    },
+                ],
+            })
+        );
 
         mapRef.current = new Map({
             target: mapTargetRef.current as HTMLElement,
@@ -123,6 +145,7 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
                 zoom: olDefaults.zoom,
             }),
         });
+        console.log("map created");
 
         if (serviceMetadata.bounds) {
             const extent = transformExtent(serviceMetadata.bounds, "EPSG:4326", "EPSG:3857");
@@ -133,7 +156,7 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
         }
 
         return () => mapRef.current?.setTarget(undefined);
-    }, [bgLayer, serviceLayer, serviceMetadata]);
+    }, [bgLayer, serviceLayer, serviceMetadata, serviceInfo]);
 
     /**************************************************************************
      * application du style
@@ -143,6 +166,7 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
 
         olParser.writeStyle(gsStyle).then((result) => {
             serviceLayer?.setStyle(result.output);
+            console.log("style changed");
         });
     }, [serviceLayer, gsStyle]);
 

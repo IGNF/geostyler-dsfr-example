@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { LegendRenderer } from "geostyler-legend";
 import { Style as GsStyle } from "geostyler-style";
 import { FC, useEffect, useRef } from "react";
@@ -24,7 +25,7 @@ const GeostylerLegend: FC<GeostylerLegendProps> = ({ gsStyle }) => {
             renderer.render(legendTargetRef.current);
         }
     }, [gsStyle]);
-    return <div ref={legendTargetRef} />;
+    return <div className={fr.cx("fr-p-1v")} ref={legendTargetRef} />;
 };
 
 export default GeostylerLegend;
