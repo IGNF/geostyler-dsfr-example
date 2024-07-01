@@ -15,6 +15,7 @@ const GeostylerLegend: FC<GeostylerLegendProps> = ({ gsStyle }) => {
                 maxColumnWidth: 200,
                 // maxColumnHeight: 600,
                 // overflow: "group",
+                // @ts-expect-error // TODO
                 styles: [gsStyle],
                 size: [200, 200],
                 hideRect: true,
