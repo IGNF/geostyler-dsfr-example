@@ -25,7 +25,15 @@ const GeostylerLegend: FC<GeostylerLegendProps> = ({ gsStyle }) => {
             renderer.render(legendTargetRef.current);
         }
     }, [gsStyle]);
-    return <div className={fr.cx("fr-p-1v")} ref={legendTargetRef} />;
+    return (
+        <div
+            className={fr.cx("fr-p-2v")}
+            ref={legendTargetRef}
+            style={{
+                backgroundColor: "white",
+            }}
+        />
+    );
 };
 
 export default GeostylerLegend;

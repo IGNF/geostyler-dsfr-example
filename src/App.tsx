@@ -84,10 +84,10 @@ const App = () => {
                 {gsStyle !== undefined && (
                     <>
                         <div className={fr.cx("fr-grid-row", "fr-my-2w")}>
-                            <div className={fr.cx("fr-col-8")}>
+                            <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
                                 <RMap gsStyle={gsStyle} serviceUrl={serviceUrl} />
                             </div>
-                            <div className={fr.cx("fr-col-4")}>
+                            <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
                                 <GeostylerLegend gsStyle={gsStyle} />
                             </div>
                         </div>
