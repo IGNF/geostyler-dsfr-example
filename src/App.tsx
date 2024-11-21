@@ -17,16 +17,20 @@ const title = "Exemple d'interfaces Geostyler en DSFR";
 
 export const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
 // const SERVICE_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/{z}/{x}/{y}.pbf`;
-const SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
+const DEFAULT_SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
 
-export const STYLE_URL =
+export const DEFAULT_STYLE_URL =
     "https://data.geopf.fr/annexes/ccommunaute-test_xavier/style/c426b115-e0fa-4bbc-bbb6-f79383829665.json";
 
 const mbParser = new MapboxStyleParser();
 
+const urlSearchParams = new URLSearchParams(window.location.search);
+const qServiceUrl = urlSearchParams.get("service_url");
+const qStyleUrl = urlSearchParams.get("style_url");
+
 const App = () => {
-    const [serviceUrl, setServiceUrl] = useState(SERVICE_INFO_URL);
-    const [styleUrl, setStyleUrl] = useState(STYLE_URL);
+    const [serviceUrl, setServiceUrl] = useState<string>(qServiceUrl ?? DEFAULT_SERVICE_INFO_URL);
+    const [styleUrl, setStyleUrl] = useState<string>(qStyleUrl ?? DEFAULT_STYLE_URL);
 
     const mbStyleQuery = useQuery({
         queryKey: [styleUrl],
@@ -45,6 +49,22 @@ const App = () => {
             });
         }
     }, [mbStyleQuery.data]);
+
+    useEffect(() => {
+        // updating the URL with the new service and style URL as they change
+        const newURL = new URL(window.location.origin);
+        const urlSearchParams = new URLSearchParams();
+
+        if (serviceUrl.length > 0) {
+            urlSearchParams.set("service_url", serviceUrl);
+        }
+        if (styleUrl.length > 0) {
+            urlSearchParams.set("style_url", styleUrl);
+        }
+        newURL.search = urlSearchParams.toString();
+
+        window.history.replaceState({ path: newURL.href }, "", newURL.href);
+    }, [serviceUrl, styleUrl]);
 
     return (
         <>
@@ -69,7 +89,7 @@ const App = () => {
                     nativeInputProps={{
                         value: serviceUrl,
                         onChange: (e) => setServiceUrl(e.currentTarget.value),
-                        placeholder: SERVICE_INFO_URL,
+                        placeholder: DEFAULT_SERVICE_INFO_URL,
                     }}
                 />
                 <Input
@@ -77,7 +97,7 @@ const App = () => {
                     nativeInputProps={{
                         value: styleUrl,
                         onChange: (e) => setStyleUrl(e.currentTarget.value),
-                        placeholder: STYLE_URL,
+                        placeholder: DEFAULT_STYLE_URL,
                     }}
                 />
 
