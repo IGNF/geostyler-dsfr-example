@@ -52,7 +52,7 @@ const App = () => {
 
     useEffect(() => {
         // updating the URL with the new service and style URL as they change
-        const newURL = new URL(window.location.origin);
+        const newURL = new URL(window.location.origin + window.location.pathname);
         const urlSearchParams = new URLSearchParams();
 
         if (serviceUrl.length > 0) {

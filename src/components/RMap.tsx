@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { XMLParser } from "fast-xml-parser";
-import LayerSwitcher from "geoportal-extensions-openlayers/src/OpenLayers/Controls/LayerSwitcher";
+import LayerSwitcher from "geopf-extensions-openlayers/src/packages/Controls/LayerSwitcher/LayerSwitcher";
+import GeoportalZoom from "geopf-extensions-openlayers/src/packages/Controls/Zoom/GeoportalZoom";
 import OpenLayersParser from "geostyler-openlayers-parser";
 import { Style as GsStyle } from "geostyler-style";
 import { View } from "ol";
 import Map from "ol/Map";
-import { ScaleLine, defaults as defaultControls } from "ol/control";
+import { ScaleLine } from "ol/control";
 import MVT from "ol/format/MVT.js";
 import { defaults as defaultInteractions } from "ol/interaction";
 import TileLayer from "ol/layer/Tile";
@@ -23,7 +24,7 @@ import olDefaults from "../data/ol-defaults.json";
 import "ol/ol.css";
 import "../css/olx.css";
 
-import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
+import "geopf-extensions-openlayers/css/Dsfr.css";
 
 type RMapProps = {
     gsStyle: GsStyle;
@@ -112,9 +113,8 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
     useEffect(() => {
         if (!bgLayer || !serviceLayer || !serviceMetadata || !serviceInfo) return;
 
-        const controls = defaultControls();
-        controls.push(new ScaleLine());
-        controls.push(
+        const controls = [
+            new ScaleLine(),
             new LayerSwitcher({
                 layers: [
                     {
@@ -131,8 +131,15 @@ const RMap: FC<RMapProps> = ({ gsStyle, serviceUrl }) => {
                         },
                     },
                 ],
-            })
-        );
+                options: {
+                    position: "top-right",
+                    collapsed: true,
+                    panel: true,
+                    counter: true,
+                },
+            }),
+            new GeoportalZoom({ position: "top-left" }),
+        ];
 
         mapRef.current = new Map({
             target: mapTargetRef.current as HTMLElement,
