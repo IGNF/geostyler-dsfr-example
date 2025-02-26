@@ -15,12 +15,12 @@ import { jsonFetch } from "./modules/jsonFetch";
 
 const title = "Exemple d'interfaces Geostyler en DSFR";
 
-export const LAYER_NAME = "OCSGE_DI_031_2022_IGN";
+export const LAYER_NAME = "OCSGE_2019";
 // const SERVICE_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}/{z}/{x}/{y}.pbf`;
 const DEFAULT_SERVICE_INFO_URL = `https://data.geopf.fr/tms/1.0.0/${LAYER_NAME}`;
 
 export const DEFAULT_STYLE_URL =
-    "https://data.geopf.fr/annexes/ccommunaute-test_xavier/style/c426b115-e0fa-4bbc-bbb6-f79383829665.json";
+    "https://data.geopf.fr/annexes/ressources/vectorTiles/styles/OCSGE/ocsge_occupation.json";
 
 const mbParser = new MapboxStyleParser();
 
