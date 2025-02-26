@@ -15,13 +15,13 @@ Cet exemple sert à démontrer que les composants UI de GeoStyler sont personnal
 Installer les dépendances avec une option `--legacy-peer-deps` nécessaire car 2 versions d'OpenLayers sont utilisées dans ce dépôt.
 
 ```sh
-npm install --legacy-peer-deps
+yarn install --legacy-peer-deps
 ```
 
 Démarrer le serveur de développement
 
 ```sh
-npm run dev
+yarn dev
 ```
 
 :rocket: le site est accessble à l'adresse : `http://localhost:5173/`.
